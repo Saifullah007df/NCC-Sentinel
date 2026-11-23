@@ -33,7 +33,7 @@ def check_environment(env=None):
     if env.get('ADMIN_PROVISIONED') != '1':
         issues.append('Admin identity must be provisioned securely before opening the service to users.')
     if env.get('PHONE_OWNERSHIP_VERIFIED') != '1':
-        issues.append('Registration phone ownership verification is not implemented: pilot must not accept unverified cadet accounts.')
+        issues.append('Confirm registration SMS ownership verification works with the real provider on actual devices; demo codes are insufficient.')
     if env.get('EDGE_PROTECTION_CONFIRMED') != '1':
         issues.append('An HTTPS edge/WAF and locked-down origin must be configured before public access.')
     if env.get('SECURITY_REVIEW_CONFIRMED') != '1':
