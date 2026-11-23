@@ -11,8 +11,11 @@ def test_full_admin_cadet_assignment_and_challenge(monkeypatch):
         c.execute('DELETE FROM rate_limit')
         c.execute('INSERT OR IGNORE INTO users VALUES(?,?,?,?,?,?,?,?)',('admin_test','Admin','ADMIN-TEST','+919999999990',PasswordHasher().hash('TestPassword1234'),'admin',1,app.now()))
     with TestClient(app.app) as client:
-        r=client.post('/register',data={'name':'Test Cadet','reg_no':'NCC-TEST','phone':'+919999999991','password':'TestPassword1234'})
-        assert r.status_code==200
+        r=client.post('/register',data={'name':'Test Cadet','reg_no':'NCC-TEST','phone':'+919999999991','password':'TestPassword1234'},follow_redirects=False)
+        assert r.status_code==303
+        assert r.headers['location']=='/verify-registration'
+        registration_code=re.search(r'(\d{6})',sms[-1]).group(1)
+        assert 'Phone verified' in client.post('/verify-registration',data={'code':registration_code}).text
         r=client.post('/login',data={'reg_no':'ADMIN-TEST','password':'TestPassword1234'},follow_redirects=False)
         assert r.status_code==303
         code=re.search(r'(\d{6})',sms[-1]).group(1)
