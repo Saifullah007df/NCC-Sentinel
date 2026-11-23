@@ -1,0 +1,33 @@
+name: NCC Sentinel backend tests
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DEV_MODE: "1"
+      SMS_MODE: demo
+      COOKIE_SECURE: "0"
+      SESSION_SECRET: ci-only-test-secret-not-for-deployment-please-replace-with-random
+      DATABASE_PATH: ${{ runner.temp }}/ncc-ci-tests.sqlite3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Python dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run tests against disposable CI database
+        run: python -m pytest -q
+      - name: Confirm deployment preflight refuses demo mode
+        run: |
+          if python scripts/deployment_preflight.py; then
+            echo "ERROR: insecure demo mode was accepted for deployment"
+            exit 1
+          fi
