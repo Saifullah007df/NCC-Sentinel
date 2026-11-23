@@ -3,7 +3,7 @@
 Responsive FastAPI web application for NCC guard-duty assignments, OTP login, duty CAPTCHA → OTP and browser GPS checkpoint checks. **This is a local pilot, not a security-certified internet deployment.** Browser GPS estimates can be spoofed and cannot guarantee physical presence within 5 metres.
 
 ## Features
-- Up to 10 cadet accounts; admin approval; regimental-number/password login followed by a fresh phone OTP **on every login**.
+- Up to 10 cadet accounts; five-minute one-use registration SMS OTP to verify phone ownership, then admin approval; regimental-number/password login followed by a fresh phone OTP **on every login**.
 - Administrator creates shifts and assigns cadets by regimental number. Cadets immediately see their own assignments.
 - Admin creates named map checkpoints with latitude/longitude and radius (default 5 metres), then attaches a checkpoint to a duty.
 - Cadet starts a duty; unpredictable 20–40 minute checks issue a 30-second server-timed CAPTCHA → SMS OTP challenge.
@@ -45,7 +45,7 @@ For Windows, use `set PYTHONPATH=.` and set a temporary `DATABASE_PATH` before r
 
 ## Admin workflow
 
-1. Log in and approve registered cadets.
+1. Cadets register, receive a phone verification SMS, submit the one-use five-minute code, and then await administrator approval. Approve only verified accounts.
 2. Create a checkpoint by clicking the map (requires internet for map tiles) or entering coordinates manually; confirm pin and radius.
 3. Create a duty slot with start and end in IST, then attach the checkpoint using **Connect checkpoint to duty**.
 4. Assign an approved cadet by regimental number.
@@ -63,7 +63,7 @@ For Windows, use `set PYTHONPATH=.` and set a temporary `DATABASE_PATH` before r
 - The local pilot uses SQLite and a single server process with an in-process timer; multiple Uvicorn workers would duplicate scheduling. Use one worker only.
 - If the browser page is closed, locked or suspended, immediate verification popups and GPS collection cannot be guaranteed. The user should keep the page foregrounded for testing.
 - A client can spoof browser GPS, accuracy, and timestamps. The code checks freshness and authorization, but it **cannot prove actual physical presence or prevent sophisticated spoofing**.
-- Phone ownership verification during registration, delivery receipts, audit-log immutability, independent worker scheduling and security penetration testing are still needed before official use.
+- Registration OTP verification is implemented, but needs a configured real SMS sender and real-device validation. Delivery receipts, audit-log immutability, independent worker scheduling and security penetration testing are still needed before official use.
 - Do not add real guard locations, phone numbers or credentials to a public repository. `.gitignore` excludes `.env` and `.db` files.
 
 ## Project files
@@ -75,3 +75,7 @@ For Windows, use `set PYTHONPATH=.` and set a temporary `DATABASE_PATH` before r
 - `static/admin-map.js`: optional OpenStreetMap checkpoint picker
 - `tests/`: four backend integration tests
 - `docs/LOCATION_VERIFICATION_DESIGN.md`: detailed feature specification
+
+## Render hosting status (2026-11-23)
+
+The project has NOT been deployed publicly. Do not deploy with `DEV_MODE=1` or an ephemeral SQLite database. Render Free services cannot attach persistent disks, and free Render Postgres expires after 30 days. See [Render readiness](docs/RENDER_DEPLOYMENT_READINESS.md). For CI, GitHub Actions runs backend tests with a disposable SQLite database; these are not a security certification.
