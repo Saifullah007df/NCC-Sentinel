@@ -14,7 +14,7 @@
 ## Deployment blockers
 
 1. The application defaults to `DEV_MODE=1` and `SMS_MODE=demo`, where phone OTPs are logged to the server console. **Never expose this configuration publicly.**
-2. Real SMS needs approved sender/recipient verification, Twilio credentials, delivery-cost control and phone ownership verification at **registration**, which the present application has not implemented.
+2. Registration now requires a five-minute, single-use phone SMS verification code before an account is created. This flow still needs real Twilio credentials, an approved sender, delivery-cost controls, and end-to-end testing on actual devices. Demo SMS does not prove actual phone ownership.
 3. The current SQLite database needs durable storage with tested backups. Render's ephemeral free web filesystem must not be used to hold cadet accounts, duty records or incidents. A persistent disk or managed durable database with appropriate schema migration is required; do not assume free Postgres is a durable long-term option.
 4. The scheduler runs inside a single FastAPI process. The app must run with **one Uvicorn worker only** until its scheduler is extracted to a durable worker and locking is implemented.
 5. HTTPS, origin access controls, WAF/rate limits, audit monitoring, threat-model review and recovery procedures are not verified. A default `onrender.com` HTTPS address alone is not sufficient DDoS hardening or origin lockdown.
