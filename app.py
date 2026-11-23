@@ -218,17 +218,7 @@ def register_page(request:Request):return page(request,'register.html')
 
 @app.post('/register')
 def register(request:Request,name:str=Form(...),reg_no:str=Form(...),phone:str=Form(...),password:str=Form(...)):
-    name=name.strip()[:90];reg_no=reg_no.strip().upper()[:40];phone=phone.strip()
-    if not name or len(reg_no)<3 or not phone.startswith('+') or not phone[1:].isdigit() or len(phone)>16 or len(password)<12:
-        return page(request,'register.html',error='Use a valid regimental number, E.164 phone (+91...), and password of at least 12 characters.')
-    try:
-        with db() as c:
-            rate(c,'register:'+clientip(request),5,3600)
-            if c.execute('SELECT COUNT(*) FROM users WHERE role="cadet"').fetchone()[0]>=10:
-                return page(request,'register.html',error='Pilot capacity reached (10 cadets). Contact the administrator.')
-            c.execute('INSERT INTO users VALUES(?,?,?,?,?,?,?,?)',(new_id(),name,reg_no,phone,ph.hash(password),'cadet',0,now()))
-    except sqlite3.IntegrityError:return page(request,'register.html',error='Regimental number or phone number already registered.')
-    return page(request,'message.html',message='Registration submitted. An administrator must approve your account before login.')
+    return begin_phone_verified_registration(request,name,reg_no,phone,password)
 
 @app.get('/login',response_class=HTMLResponse)
 def login_page(request:Request):return page(request,'login.html')
@@ -430,6 +420,8 @@ from location_extension import register as register_location
 setup()
 location_tools=register_location(app,sys.modules[__name__])
 create_location_challenge=location_tools['create_location_challenge']
+from registration_verification import register_routes
+begin_phone_verified_registration=register_routes(app,sys.modules[__name__])
 
 if __name__=='__main__':
     import argparse
