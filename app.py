@@ -7,7 +7,7 @@ from typing import Optional
 
 from argon2 import PasswordHasher
 from fastapi import FastAPI, Request, Form, HTTPException
-from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
@@ -200,6 +200,10 @@ async def headers(req,call_next):
     resp.headers['Content-Security-Policy']="default-src 'self'; script-src 'self' https://unpkg.com https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; img-src 'self' data: https://*.tile.openstreetmap.org; style-src 'self' 'unsafe-inline' https://unpkg.com; form-action 'self'; frame-ancestors 'none'; base-uri 'self'"
     if COOKIE_SECURE:resp.headers['Strict-Transport-Security']='max-age=31536000; includeSubDomains'
     return resp
+
+@app.get('/sw.js', include_in_schema=False)
+def service_worker():
+    return FileResponse(BASE/'static'/'sw.js', media_type='application/javascript', headers={'Cache-Control':'no-cache','Service-Worker-Allowed':'/'})
 
 @app.get('/health')
 def health():return {'status':'ok'}
