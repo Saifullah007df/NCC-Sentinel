@@ -1,0 +1,12 @@
+NCC SENTINEL - FIRST-TIME SETUP (WINDOWS)
+
+1. Extract the entire ZIP into a normal folder (do not run inside the ZIP).
+2. Install Python 3.11 or newer from https://www.python.org/downloads/ (enable PATH).
+3. Double-click start_windows.bat.
+4. On first run, create the admin login ID and password (at least 12 characters).
+5. The browser should open at http://127.0.0.1:8000
+6. Sign in using your admin ID/password. Read the ONE-TIME CODE printed in the black terminal window and enter it on the website.
+7. Create a cadet account via Register, approve it in Admin, then assign a duty using its regimental number.
+
+This is a LOCAL DEMO, NOT an internet-deployed site. The OTP is displayed in the terminal and will not be delivered by SMS until a provider is configured.
+If the launcher stops, send the last visible error text or a screenshot.
